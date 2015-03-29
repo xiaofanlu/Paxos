@@ -7,18 +7,16 @@ import util.Command;
  * Decision Message for Commander
  */
 
-public class DecisionMsg extends Message {
-  public int slotNum;
+public class RequestMsg extends Message {
   public Command prop;
 
-  public DecisionMsg(int pid, int s, Command p) {
+  public RequestMsg(int pid, Command p) {
     src = pid;
-    slotNum = s;
     prop = p;
   }
 
   @Override
   public String toString() {
-    return "DecisionMsg: " + src + " " + slotNum + " " + prop;
+    return "RqstMsg: " + src + " " + prop;
   }
 }

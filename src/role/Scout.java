@@ -17,15 +17,18 @@ public class Scout extends Role {
   Set<Integer> waitfor = new HashSet<Integer>();
   Set<Pvalue> pvalues = new HashSet<Pvalue>();
 
-  public Scout(int pid, Controller ctl, int lambda, int[] acceptors,
+  public Scout(int pid, Controller ctrl, int lambda, int[] acceptors,
                BallotNum b) {
-    super(pid, ctl);
+    super(pid, ctrl);
     this.lambda = lambda;
     this.acceptors = acceptors;
     this.b = b;
+
+    ctrl.roles.put(pid, this);
   }
 
-  public void start () {
+  @Override
+  public void exec () {
     for (int acpt : acceptors) {
       waitfor.add(acpt);
       send(acpt, new P1aMsg(pid, b));
@@ -51,5 +54,10 @@ public class Scout extends Role {
         }
       }
     }
+  }
+
+
+  public String myName() {
+    return "Scout";
   }
 }

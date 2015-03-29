@@ -14,11 +14,13 @@ public class Acceptor extends Role {
   BallotNum ballotNum = new BallotNum(-1, 0);
   Set<Pvalue> accepted = new HashSet<Pvalue>();
 
-  public Acceptor(int id, Controller ctr) {
-    super(id, ctr);
+  public Acceptor(int id, Controller ctrl) {
+    super(id, ctrl);
+
+    ctrl.roles.put(pid, this);
   }
 
-  public void start () {
+  public void exec () {
     while (true) {
       Message msg = receive();
       if (msg instanceof P1aMsg) {
@@ -49,6 +51,10 @@ public class Acceptor extends Role {
       default:
         return null;
     }
+  }
+
+  public String myName() {
+    return "Acceptor";
   }
 
 }

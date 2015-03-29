@@ -8,15 +8,15 @@ import util.BallotNum;
  */
 
 public class PreemptedMsg extends Message {
-  BallotNum ballot_num;
+  public BallotNum ballotNum;
 
   public PreemptedMsg(int pid, BallotNum b) {
     src = pid;
-    ballot_num = b;
+    ballotNum = b;
   }
 
   @Override
   public String toString() {
-    return "PreemptedMsg: " + src + " " + ballot_num;
+    return "PreemptedMsg: " + src + " " + ballotNum;
   }
 }

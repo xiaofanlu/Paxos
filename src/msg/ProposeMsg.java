@@ -7,11 +7,11 @@ import util.Command;
  * Decision Message for Commander
  */
 
-public class DecisionMsg extends Message {
+public class ProposeMsg extends Message {
   public int slotNum;
   public Command prop;
 
-  public DecisionMsg(int pid, int s, Command p) {
+  public ProposeMsg(int pid, int s, Command p) {
     src = pid;
     slotNum = s;
     prop = p;
@@ -19,6 +19,6 @@ public class DecisionMsg extends Message {
 
   @Override
   public String toString() {
-    return "DecisionMsg: " + src + " " + slotNum + " " + prop;
+    return "ProposeMsg: " + src + " " + slotNum + " " + prop;
   }
 }

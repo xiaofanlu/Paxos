@@ -11,5 +11,11 @@ public abstract class Message implements Serializable {
 
   public int src;
   public int dst;
+
+  public String print () {
+    String rst = "\n" + src + " -> " + dst + "\t";
+    rst += this.toString() + "\n";
+    return rst;
+  }
 }
 

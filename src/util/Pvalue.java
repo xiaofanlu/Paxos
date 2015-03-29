@@ -4,12 +4,12 @@ package util;
 /**
  * Created by xiaofan on 3/26/15.
  */
-public class Pvalue {
+public class Pvalue implements Comparable<Pvalue> {
   public BallotNum ballotNum;
   public int slotNum;
-  public Proposal prop;
+  public Command prop;
 
-  public Pvalue (BallotNum b, int s, Proposal p) {
+  public Pvalue (BallotNum b, int s, Command p) {
     ballotNum = b;
     slotNum = s;
     prop = p;
@@ -27,5 +27,10 @@ public class Pvalue {
         prop;
     System.out.println(rst);
     return rst;
+  }
+
+  @Override
+  public int compareTo(Pvalue o) {
+    return ballotNum.compareTo(o.ballotNum);
   }
 }

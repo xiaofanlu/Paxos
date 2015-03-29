@@ -12,11 +12,11 @@ public class P1aMsg extends Message {
 
   public P1aMsg(int pid, BallotNum b) {
     src = pid;
-    ballot_num = b;
+    ballotNum = b;
   }
 
   @Override
   public String toString() {
-    return "P1aMsg : " + src + " " + ballot_num;
+    return "P1aMsg : " + src + " " + ballotNum;
   }
 }

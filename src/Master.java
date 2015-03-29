@@ -1,3 +1,5 @@
+import role.Controller;
+
 import java.util.Scanner;
 
 public class Master {
@@ -5,6 +7,7 @@ public class Master {
   public static void main(String [] args) {
     Scanner scan = new Scanner(System.in);
     int numNodes, numClients;
+    Controller ctrl = null;
 
     while (scan.hasNextLine()) {
       String [] inputLine = scan.nextLine().split(" ");
@@ -18,6 +21,7 @@ public class Master {
              * start up the right number of nodes and clients, and store the 
              *  connections to them for sending further commands
              */
+          ctrl = new Controller(numNodes, numClients);
           break;
         case "sendMessage":
           clientIndex = Integer.parseInt(inputLine[1]);

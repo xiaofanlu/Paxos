@@ -1,10 +1,14 @@
-package util; /**
+package util;
+
+import java.io.Serializable;
+
+/**
  * Created by xiaofan on 3/26/1
  */
 
-public class BallotNum implements Comparable<BallotNum> {
-  int round;
-  int pid;
+public class BallotNum implements Comparable<BallotNum>, Serializable {
+  public int round;
+  public int pid;
 
   public BallotNum (int r, int p) {
     round = r;

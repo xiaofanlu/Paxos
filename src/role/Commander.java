@@ -26,9 +26,11 @@ public class Commander extends Role {
     this.replicas = replicas;
     this.pv = p;
     this.b = p.ballotNum;
+
+    ctrl.roles.put(pid, this);
   }
 
-  public void start() {
+  public void exec() {
     for (int acpt : acceptors) {
       waitfor.add(acpt);
       send(acpt, new P2aMsg(pid, pv));
@@ -55,5 +57,9 @@ public class Commander extends Role {
         }
       }
     }
+  }
+
+  public String myName() {
+    return "Commander";
   }
 }

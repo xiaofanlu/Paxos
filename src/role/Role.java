@@ -10,18 +10,29 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class Role extends Thread {
   int pid;
-  Controller ctr;
+  Controller ctrl;
   Queue<Message> inbox;
 
   public Role (int id, Controller c) {
     pid = id;
-    ctr = c;
+    ctrl = c;
     inbox = new LinkedBlockingQueue<Message>();
+    if (ctrl.debug) {
+     System.out.println(myName() + " created with id: " + pid);
+    }
   }
 
   public void send (int dst, Message msg) {
     msg.dst = dst;
-    ctr.send(msg);
+    ctrl.send(msg);
+  }
+
+  public void exec() {
+  }
+
+  public void run() {
+    exec();
+    ctrl.remove(pid);
   }
 
   public void deliver (Message msg) {
@@ -30,6 +41,10 @@ public class Role extends Thread {
 
   public Message receive () {
     return inbox.poll();
+  }
+
+  public String myName() {
+    return "Role";
   }
 
 
