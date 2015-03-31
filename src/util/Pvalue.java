@@ -25,7 +25,7 @@ public class Pvalue implements Comparable<Pvalue> {
   public String toString() {
     String rst = "pvalue => " + ballotNum + "slot(" + slotNum + ") " +
         prop;
-    System.out.println(rst);
+    //System.out.println(rst);
     return rst;
   }
 

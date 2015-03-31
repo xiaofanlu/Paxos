@@ -1,5 +1,6 @@
 package role;
 
+import exec.Server;
 import msg.*;
 import util.BallotNum;
 import util.Pvalue;
@@ -14,15 +15,17 @@ public class Acceptor extends Role {
   BallotNum ballotNum = new BallotNum(-1, 0);
   Set<Pvalue> accepted = new HashSet<Pvalue>();
 
-  public Acceptor(int id, Controller ctrl) {
+  public Acceptor(int id, Server ctrl) {
     super(id, ctrl);
-
     ctrl.roles.put(pid, this);
   }
 
   public void exec () {
-    while (true) {
+    while (!ctrl.shutdown) {
       Message msg = receive();
+      if (ctrl.shutdown) {
+        return;
+      }
       if (msg instanceof P1aMsg) {
         P1aMsg p1a = (P1aMsg) msg;
         BallotNum b = p1a.ballotNum;

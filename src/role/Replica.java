@@ -1,32 +1,27 @@
 package role;
 
+import exec.Server;
 import msg.*;
 import util.Command;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * Created by xiaofan on 3/26/15.
  */
 public class Replica extends Role {
-  public List<Command> state;
   public int slotNum;
   public Map<Integer, Command> proposals;
   public Map<Integer, Command> decisions;
-  public int[] leaders;
 
-  public Replica(int pid, Controller ctrl, int[] leaders, List<Command>
-      initialState) {
-    super(pid, ctrl);
-    this.leaders = leaders;
-    state = initialState;
-    slotNum = 0;
+  public Replica(int pid, Server svr, Map<Integer, Command> initial, int
+      slotCount) {
+    super(pid, svr);
+    slotNum = slotCount;
     proposals = new HashMap<Integer, Command>();
-    decisions = new HashMap<Integer, Command>();
-
-    ctrl.roles.put(pid, this);
+    decisions = initial;
+    svr.roles.put(pid, this);
   }
 
   /**
@@ -44,9 +39,7 @@ public class Replica extends Role {
     if (!decisions.containsValue(p)) {
       int s = getMaxSlotNum();
       proposals.put(s, p);
-      for (int lambda : leaders) {
-        send(lambda, new ProposeMsg(pid, s, p));
-      }
+      send(ctrl.getLeader(), new ProposeMsg(pid, s, p));
     }
   }
 
@@ -63,8 +56,6 @@ public class Replica extends Role {
         return;
       }
     }
-    // execute the command
-    state.add(p);
     //send(p.kappa, new ResponseMsg());
     for (int cid : ctrl.clients) {
       send(cid, new ResponseMsg(pid, slotNum, p));
@@ -73,8 +64,11 @@ public class Replica extends Role {
   }
 
   public void exec () {
-    while (true) {
+    while (!ctrl.shutdown) {
       Message msg = receive();
+      if (ctrl.shutdown) {
+        return;
+      }
       if (msg instanceof RequestMsg) {
         RequestMsg rqstMsg = (RequestMsg) msg;
         propose(rqstMsg.prop);
@@ -89,6 +83,11 @@ public class Replica extends Role {
           }
           perform(decisions.get(slotNum));
         }
+      }
+      if (msg instanceof StateQueryMsg) {
+        StateReplyMsg srm = new StateReplyMsg(pid, slotNum, new
+            HashMap<Integer, Command>(decisions), ctrl.leaderID);
+        send(msg.src, srm);
       }
     }
   }

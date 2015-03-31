@@ -1,11 +1,10 @@
 package role;
 
-import msg.AdoptedMsg;
-import msg.Message;
-import msg.PreemptedMsg;
-import msg.ProposeMsg;
+import exec.Server;
+import msg.*;
 import util.BallotNum;
 import util.Command;
+import util.Constants;
 import util.Pvalue;
 
 import java.util.HashMap;
@@ -22,7 +21,7 @@ public class Leader extends Role {
   public int[] acceptors;
   public int[] replicas;
 
-  public Leader(int pid, Controller ctrl, int[] acceptors, int[] replicas) {
+  public Leader(int pid, Server ctrl, int[] acceptors, int[] replicas) {
     super(pid, ctrl);
     this.acceptors = acceptors;
     this.replicas = replicas;
@@ -33,9 +32,13 @@ public class Leader extends Role {
   }
 
   public void exec () {
+    new HeartBeater().start();
     new Scout(ctrl.nextId(), ctrl, pid, acceptors, ballotNum).start();
-    while (true) {
+    while (!ctrl.shutdown) {
       Message msg = receive();
+      if (ctrl.shutdown) {
+        return;
+      }
       if (msg instanceof ProposeMsg) {
         ProposeMsg propMsg = (ProposeMsg) msg;
         if (!proposals.containsKey(propMsg.slotNum)) {
@@ -93,4 +96,16 @@ public class Leader extends Role {
   }
 
 
+  class HeartBeater extends Thread {
+    public void run() {
+      while (!ctrl.shutdown) {
+        broadcast(new HeartBeatMsg(pid));
+        try {
+          Thread.sleep(Constants.TIMEGAP);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
 }

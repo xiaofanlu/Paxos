@@ -1,5 +1,6 @@
 package role;
 
+import exec.Server;
 import msg.*;
 import util.BallotNum;
 import util.Pvalue;
@@ -18,9 +19,9 @@ public class Commander extends Role {
   BallotNum b;
   Set<Integer> waitfor = new HashSet<Integer>();
 
-  public Commander(int pid, Controller ctl, int lambda, int[] acceptors,
+  public Commander(int pid, Server ctrl, int lambda, int[] acceptors,
                    int[] replicas, Pvalue p) {
-    super(pid, ctl);
+    super(pid, ctrl);
     this.lambda = lambda;
     this.acceptors = acceptors;
     this.replicas = replicas;
@@ -36,17 +37,20 @@ public class Commander extends Role {
       send(acpt, new P2aMsg(pid, pv));
     }
 
-    while (true) {
+    while (!ctrl.shutdown) {
       Message msg = receive();
+      if (ctrl.shutdown) {
+        return;
+      }
       if (msg instanceof P2bMsg) {
         P2bMsg p2b = (P2bMsg) msg;
         if (b.compareTo(p2b.ballotNum) == 0) {
           if (waitfor.contains(p2b.src)) {
             waitfor.remove(p2b.src);
           }
-          if (waitfor.size() < acceptors.length / 2) {
-            Message decision = new DecisionMsg(pid, pv.slotNum, pv.prop);
+          if (waitfor.size() < (acceptors.length + 1) / 2) {
             for (int p : replicas) {
+              Message decision = new DecisionMsg(pid, pv.slotNum, pv.prop);
               send(p, decision);
             }
             return; // exit();

@@ -1,4 +1,4 @@
-package role;
+package exec;
 
 /**
  * Created by xiaofan on 3/28/15.
@@ -16,39 +16,44 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class Client extends Role {
-  int sequenceNum = 0;
+public class Client extends NetNode {
+  public static final boolean GUI_on = false;
+
+
+  int sequenceNum;
+  /* client id, negative num for pid */
   int cid;
+  Map<Integer, ResponseMsg> log;
+
 
   // For GUI
   JFrame frame;
   JTextField textField;
   JTextArea messageArea;
-  Map<Integer, Command> log;
 
 
-  public Client(int pid, Controller ctrl, int cid) {
-
-    super(pid, ctrl);
+  public Client(int cid, int numServers, int numClients, NetSim net) {
+    super(net, cid, numServers, numClients);
+    this.sequenceNum = 0;
     this.cid = cid;
-    log = new HashMap<Integer, Command>();
-    // Layout GUI
-    guiSetup();
 
-    ctrl.roles.put(pid, this);
+    log = new HashMap<Integer, ResponseMsg>();
+    // Layout GUI
+    if (GUI_on) {
+      guiSetup();
+    }
   }
 
-
-
-  public void exec() {
-
+  public void run() {
     while (true){
       Message msg = receive();
       if (msg instanceof ResponseMsg) {
         ResponseMsg rspnMsg = (ResponseMsg) msg;
         if (!log.containsKey(rspnMsg.slotNum)) {
-          log.put(rspnMsg.slotNum, rspnMsg.prop);
-          messageArea.append(rspnMsg.format() + "\n");
+          log.put(rspnMsg.slotNum, rspnMsg);
+          if (GUI_on) {
+            messageArea.append(rspnMsg.format() + "\n");
+          }
         }
       }
     }
@@ -67,11 +72,10 @@ public class Client extends Role {
     }
   }
 
-
   public void broadcast (String s) {
     Command prop = new Command(cid, sequenceNum, s);
     sequenceNum++;
-    for (int id : ctrl.replicas) {
+    for (int id : replicas) {
       send(id, new RequestMsg(pid, prop));
     }
   }
@@ -99,6 +103,17 @@ public class Client extends Role {
     frame.setVisible(true);
     textField.setEditable(true);
   }
+
+  public String printChatLog () {
+    StringBuilder sb = new StringBuilder();
+    int slotNum = 0;
+    while (log.containsKey(slotNum)) {
+      sb.append(log.get(slotNum).format() + "\n");
+      slotNum++;
+    }
+    return sb.toString();
+  }
+
 
   public String myName() {
     return "Client";

@@ -1,22 +1,22 @@
 package role;
 
+import exec.Server;
 import msg.Message;
-
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import util.Constants;
+import util.MsgQueue;
 
 /**
  * Created by xiaofan on 3/26/15.
  */
 public class Role extends Thread {
   int pid;
-  Controller ctrl;
-  Queue<Message> inbox;
+  Server ctrl;
+  MsgQueue inbox;
 
-  public Role (int id, Controller c) {
+  public Role (int id, Server s) {
     pid = id;
-    ctrl = c;
-    inbox = new LinkedBlockingQueue<Message>();
+    ctrl = s;
+    inbox = new MsgQueue();
     if (ctrl.debug) {
      System.out.println(myName() + " created with id: " + pid);
     }
@@ -25,6 +25,12 @@ public class Role extends Thread {
   public void send (int dst, Message msg) {
     msg.dst = dst;
     ctrl.send(msg);
+  }
+
+  public void broadcast (Message msg) {
+    for (int i = 1; i <= ctrl.numServers; i++) {
+      send(i * Constants.BASE, msg);
+    }
   }
 
   public void exec() {

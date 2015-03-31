@@ -41,6 +41,6 @@ public class Command {
 
   @Override
   public String toString () {
-    return "Cmd(" + cid + ", " + cid + ", " + text + ")";
+    return "Cmd(" + kappa + ", " + cid + ", " + text + ")";
   }
 }

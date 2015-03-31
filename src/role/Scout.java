@@ -1,5 +1,6 @@
 package role;
 
+import exec.Server;
 import msg.*;
 import util.BallotNum;
 import util.Pvalue;
@@ -17,7 +18,7 @@ public class Scout extends Role {
   Set<Integer> waitfor = new HashSet<Integer>();
   Set<Pvalue> pvalues = new HashSet<Pvalue>();
 
-  public Scout(int pid, Controller ctrl, int lambda, int[] acceptors,
+  public Scout(int pid, Server ctrl, int lambda, int[] acceptors,
                BallotNum b) {
     super(pid, ctrl);
     this.lambda = lambda;
@@ -34,8 +35,11 @@ public class Scout extends Role {
       send(acpt, new P1aMsg(pid, b));
     }
 
-    while (true) {
+    while (!ctrl.shutdown) {
       Message msg = receive();
+      if (ctrl.shutdown) {
+        return;
+      }
       if (msg instanceof P1bMsg) {
         P1bMsg p1b = (P1bMsg) msg;
         if (b.compareTo(p1b.ballotNum) == 0) {
@@ -43,7 +47,7 @@ public class Scout extends Role {
             pvalues.addAll(p1b.accepted);
             waitfor.remove(p1b.src);
           }
-          if (waitfor.size() < acceptors.length / 2) {
+          if (waitfor.size() < (acceptors.length + 1) / 2) {
             Message adopted = new AdoptedMsg(pid, b, pvalues);
             send(lambda, adopted);
             return; // exit();
