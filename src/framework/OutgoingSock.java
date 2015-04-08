@@ -12,7 +12,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class OutgoingSock {
-	final static byte[] MSG_SEP = "&".getBytes();
+
+	final static byte[] MSG_SEP = "$()|".getBytes();
 	Socket sock;
 	OutputStream out;
 	

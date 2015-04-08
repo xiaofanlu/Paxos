@@ -28,7 +28,7 @@ public class Role extends Thread {
   }
 
   public void broadcast (Message msg) {
-    for (int i = 1; i <= ctrl.numServers; i++) {
+    for (int i = 0; i < ctrl.numServers; i++) {
       send(i * Constants.BASE, msg);
     }
   }

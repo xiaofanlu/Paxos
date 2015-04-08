@@ -1,10 +1,13 @@
 package util;
 
 
+import java.io.Serializable;
+
 /**
  * Created by xiaofan on 3/26/15.
  */
-public class Pvalue implements Comparable<Pvalue> {
+public class Pvalue implements Comparable<Pvalue>, Serializable {
+  public static final long serialVersionUID = 6473128480951855693L;
   public BallotNum ballotNum;
   public int slotNum;
   public Command prop;

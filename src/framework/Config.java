@@ -1,7 +1,7 @@
 /**
  * This code may be modified and used for non-commercial 
  * purposes as long as attribution is maintained.
- * 
+ *
  * @author: Isaac Levy
  */
 
@@ -9,7 +9,10 @@ package framework;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Config {
   /**
@@ -44,28 +47,49 @@ public class Config {
 
 
   /**
-	 * @param numServers, index
-	 * @throws IOException
-	 */
-	public Config(int index, int numServers) throws IOException {
+   * @param numServers, index
+   * @throws IOException
+   */
+  public Config(int index, int numServers) {
 
     logger = Logger.getLogger("NetFramework");
-		numProcesses = numServers;
-    procNum = index;
-		addresses = new InetAddress[numProcesses];
-		ports = new int[numProcesses];
+    FileHandler fh;
+    try {
+      // This block configure the logger with handler and formatter
+      fh = new FileHandler("log/netLog.txt");
+      logger.addHandler(fh);
+      SimpleFormatter formatter = new SimpleFormatter();
+      fh.setFormatter(formatter);
 
-		for (int i = 0; i < numProcesses; i++) {
-			ports[i] = PORTBASE + i;
-			addresses[i] = InetAddress.getByName(ADDR);
-			System.out.printf("%d: %d @ %s\n", i, ports[i], addresses[i]);
-		}
-	}
-	
-	/**
-	 * Default constructor for those who want to populate config file manually
-	 */
-	public Config() {
-	}
+      // the following statement is used to log any messages
+      logger.setUseParentHandlers(false);
+    } catch (SecurityException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+
+    numProcesses = numServers;
+    procNum = index;
+    addresses = new InetAddress[numProcesses];
+    ports = new int[numProcesses];
+
+    for (int i = 0; i < numProcesses; i++) {
+      ports[i] = PORTBASE + i;
+      try {
+        addresses[i] = InetAddress.getByName(ADDR);
+      } catch (UnknownHostException e) {
+        e.printStackTrace();
+      }
+      //System.out.printf("%d: %d @ %s\n", i, ports[i], addresses[i]);
+    }
+  }
+
+  /**
+   * Default constructor for those who want to populate config file manually
+   */
+  public Config() {
+  }
 
 }

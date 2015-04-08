@@ -7,13 +7,13 @@ import java.util.Scanner;
  */
 public class Master {
 
-  public static void main(String [] args) {
+  public static void main(String[] args) {
     Scanner scan = new Scanner(System.in);
     int numNodes = 0, numClients = 0;
     NetSim ns = null;
 
     while (scan.hasNextLine()) {
-      String [] inputLine = scan.nextLine().split(" ");
+      String[] inputLine = scan.nextLine().split(" ");
       int clientIndex, nodeIndex;
       //System.out.println(inputLine[0]);
       if (inputLine[0].equals("start")) {
@@ -24,6 +24,7 @@ public class Master {
                *  connections to them for sending further commands
                */
         ns = new NetSim(numNodes, numClients);
+        // startExec(numNodes, numClients);
 
       } else if (inputLine[0].equals("sendMessage")) {
         clientIndex = Integer.parseInt(inputLine[1]);
@@ -55,12 +56,7 @@ public class Master {
                * come to consensus in PAXOS do, and that all clients have heard
                * of them
                */
-        try {
-          Thread.sleep(500);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-
+        ns.allClear();
       } else if (inputLine[0].equals("crashServer")) {
         nodeIndex = Integer.parseInt(inputLine[1]);
               /*
@@ -68,11 +64,11 @@ public class Master {
                */
 
         ns.crashServer(nodeIndex);
-
       } else if (inputLine[0].equals("restartServer")) {
         nodeIndex = Integer.parseInt(inputLine[1]);
               /*
                * Restart the server specified by nodeIndex
+               * introduce some delay for leader election.
                */
         ns.restartServer(nodeIndex);
 
@@ -89,4 +85,5 @@ public class Master {
     }
     System.exit(1);
   }
+
 }

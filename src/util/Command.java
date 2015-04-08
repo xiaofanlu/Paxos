@@ -1,12 +1,15 @@
 package util;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Created by xiaofan on 3/26/15.
  */
 
-public class Command {
+public class Command implements Serializable {
+  public static final long serialVersionUID = 6473128480951955693L;
+
   /** Identifier of the client */
   public int kappa;
 

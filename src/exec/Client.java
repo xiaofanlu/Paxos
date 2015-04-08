@@ -15,9 +15,8 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class Client extends NetNode {
-  public static final boolean GUI_on = false;
+  public static final boolean GUI_on = true;
 
 
   int sequenceNum;
@@ -32,8 +31,9 @@ public class Client extends NetNode {
   JTextArea messageArea;
 
 
-  public Client(int cid, int numServers, int numClients, NetSim net) {
-    super(net, cid, numServers, numClients);
+  public Client(int cid, int numServers, int numClients) {
+    super(numServers + cid, numServers, numClients);
+
     this.sequenceNum = 0;
     this.cid = cid;
 

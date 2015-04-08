@@ -17,5 +17,8 @@ public abstract class Message implements Serializable {
     rst += this.toString() + "\n";
     return rst;
   }
+
+
+
 }
 

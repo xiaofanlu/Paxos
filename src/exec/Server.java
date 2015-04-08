@@ -21,7 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class Server extends NetNode {
-  public static boolean debug = false;
+  //public static boolean debug = false;
 
   /**
    * Server identifier
@@ -29,8 +29,6 @@ public class Server extends NetNode {
   public int index;
 
   public int leaderID;
-
-  public boolean shutdown = false;
 
   /**
    * For time bomb leader
@@ -59,14 +57,13 @@ public class Server extends NetNode {
 
   HeartBeatTimer hbt;
 
-  public Server(int idx, int numSevers, int numClients, NetSim net,
-                boolean restart) {
-    super(net, idx, numSevers, numClients);
+  public Server(int idx, int numSevers, int numClients,  boolean restart) {
+    super(idx, numSevers, numClients);
     index = idx;
     roles = new HashMap<Integer, Role>();
 
     if (!restart) {
-      leaderID = 1;
+      leaderID = 0;
       /* initiates replica */
       Map<Integer, Command> committed = new HashMap<Integer, Command>();
       int rpid = combine(index, Constants.REPLICA);
@@ -151,6 +148,9 @@ public class Server extends NetNode {
           }
         }
       } else  if (msg != null) {
+        if (debug) {
+          System.out.println("Rev@" + index + ": " + msg.print());
+        }
         relay(msg);
       }
     }
@@ -200,17 +200,18 @@ public class Server extends NetNode {
     if (msg instanceof P1aMsg || msg instanceof P2aMsg) {
       timerLock.lock();
       if (timer == 0) {
-        System.out.println("Shutdown Now!");
+        //System.out.println("Shutdown Now!");
         cleanShutDown();
         return;
       }
       if (timer > 0) {
         timer--;
-        System.out.println("Shutdown timer: " + timer);
+        //System.out.println("Shutdown timer: " + timer);
       }
       timerLock.unlock();
     }
-    ns.send(msg);
+    //ns.send(msg);
+    super.send(msg);
   }
 
   public void timeBombLeader (int count) {
@@ -243,13 +244,6 @@ public class Server extends NetNode {
   }
 
 
-  /**
-   * Clean shutdown the server, including all the
-   * Replica, Acceptor, Leader, etc. associated with this server
-   */
-  public void cleanShutDown () {
-    shutdown = true;
-  }
 
 
   public class HeartBeatTimer extends Thread{

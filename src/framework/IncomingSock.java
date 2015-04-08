@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class IncomingSock extends Thread {
-	final static String MSG_SEP = "&";
+	final static String MSG_SEP = "$()|";
 	Socket sock;
 	InputStream in;
 	private volatile boolean shutdownSet;
@@ -54,7 +54,7 @@ public class IncomingSock extends Thread {
 					int curIdx;
 					while ((curIdx = dataStr.indexOf(MSG_SEP, curPtr)) != -1) {
 						queue.offer(dataStr.substring(curPtr, curIdx));
-						curPtr = curIdx + 1;
+						curPtr = curIdx + MSG_SEP.length();
 					}
 					in.reset();
 					in.skip(curPtr);

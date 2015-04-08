@@ -17,6 +17,6 @@ public class Constants {
   /**
    * For heart beat message
    */
-  public static final int TIMEOUT = 500;
-  public static final int TIMEGAP = 100;
+  public static final int TIMEOUT = 200;
+  public static final int TIMEGAP = 50;
 }
