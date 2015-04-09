@@ -2,6 +2,7 @@ package exec;
 
 import framework.Config;
 import framework.NetController;
+import msg.DecisionMsg;
 import msg.HeartBeatMsg;
 import msg.Message;
 import org.apache.commons.codec.binary.Base64;
@@ -18,7 +19,7 @@ import java.util.List;
  * Created by xiaofan on 3/30/15.
  */
 public class NetNode extends Thread {
-  public boolean debug = true;
+  public boolean debug = false;
 
   public int pid;
   public int numServers;
@@ -151,17 +152,29 @@ public class NetNode extends Thread {
             deliver(msg);
             //System.out.println(pid + ": " + msg.print());
             if (!(msg instanceof HeartBeatMsg)) {
-              busy = true;
               count = 0;
-            } else if (busy) {
-              /*
-               * set to non-busy after ten consecutive heartbeat
-               */
-              count++;
-              if (count == 5) {
+              if (msg instanceof DecisionMsg) {
+                if (debug) {
+                  System.out.println("Not Busy " + pid + ": " + msg.print());
+                }
                 busy = false;
+              } else {
+                if (debug) {
+                  System.out.println("Busy " + pid + ": " + msg.print());
+                }
+                busy = true;
               }
+            } else {
+              // 10 consecutive heartbeat means not busy
+              if (busy) {
+                count++;
+                if (count > 10) {
+                  busy = false;
+                }
+              }
+
             }
+
           }
         }
         try {

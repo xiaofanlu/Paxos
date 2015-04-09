@@ -3,6 +3,7 @@ package role;
 import exec.Server;
 import msg.*;
 import util.BallotNum;
+import util.Constants;
 import util.Pvalue;
 
 import java.util.HashSet;
@@ -32,14 +33,19 @@ public class Commander extends Role {
   }
 
   public void exec() {
+    // performance trick, send to non-leader acceptor first
     for (int acpt : acceptors) {
-      if (acpt != ctrl.leaderID) {
+      if (acpt/ Constants.BASE != ctrl.leaderID) {
         waitfor.add(acpt);
         send(acpt, new P2aMsg(pid, pv));
       }
     }
-    waitfor.add(ctrl.leaderID);
-    send(ctrl.leaderID, new P2aMsg(pid, pv));
+    for (int acpt : acceptors) {
+      if (acpt/ Constants.BASE == ctrl.leaderID) {
+        waitfor.add(acpt);
+        send(acpt, new P2aMsg(pid, pv));
+      }
+    }
 
     while (!ctrl.shutdown) {
       Message msg = receive();

@@ -1,10 +1,16 @@
 package exec;
 
+import util.Constants;
+
+import java.util.HashSet;
+
 /**
  * Created by xiaofan on 3/30/15.
  * For test only
  */
 public class NetSim {
+  public boolean debug = false;
+
   public Server[] servers;
   public Client[] clients;
 
@@ -68,6 +74,8 @@ public class NetSim {
    * Create a new thread to rebuild the leader as we need to receive message.
    */
   public void restartServer(int sid) {
+    /* wait for socket to restart */
+    takeSnap(100);
     servers[sid] = new Server(sid, servers.length, clients.length, true);
     servers[sid].recover();
     servers[sid].start();
@@ -75,25 +83,58 @@ public class NetSim {
 
 
   public void allClear() {
-    /*
-    while (true) {
+    if (true) {
+
+      // must be longer than timeout for heart beat
+      takeSnap(Constants.TIMEOUT + 50);
+      HashSet<Server> busyNode = new HashSet<Server>();
       for (Server s : servers) {
-        if (!s.busy) {
-          return;
+        if (s!= null && !s.shutdown) {
+          busyNode.add(s);
+          // wait for new leader election
+          while (servers[s.leaderID].shutdown) {
+            takeSnap(Constants.TIMEOUT);
+          }
         }
       }
-      try {
-        Thread.sleep(50);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
+      while (true) {
+       for (Server s : servers) {
+          if (busyNode.contains(s) && !s.busy) {
+            if (debug) {
+              System.out.println(s.pid + " is not busy, remove");
+            }
+            busyNode.remove(s);
+            if (busyNode.isEmpty()) {
+              if (debug) {
+                System.out.println("\n>>>>>>>>>>>>>>>>> all clear " +
+                    "<<<<<<<<<<<<<<<<<<\n");
+              }
+              takeSnap(50);
+              return;
+            }
+          }
+        }
+        for (Server s : busyNode) {
+          if (debug) {
+            System.out.println("Still waiting for node : " + s.pid);
+          }
+        }
+        takeSnap(100);
       }
+
+    } else {
+        takeSnap(300);
     }
   }
-  */
+
+
+  public void takeSnap (int time) {
     try {
-      Thread.sleep(500);
+      Thread.sleep(time);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
   }
+
+
 }

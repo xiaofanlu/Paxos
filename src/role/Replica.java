@@ -13,7 +13,7 @@ import java.util.Map;
 public class Replica extends Role {
   public int slotNum;
   public Map<Integer, Command> proposals;
-  public Map<Integer, Command> decisions;
+  public volatile Map<Integer, Command> decisions;
 
   public Replica(int pid, Server svr, Map<Integer, Command> initial, int
       slotCount) {
@@ -39,7 +39,8 @@ public class Replica extends Role {
     if (!decisions.containsValue(p)) {
       int s = getMaxSlotNum();
       proposals.put(s, p);
-      send(ctrl.getLeader(), new ProposeMsg(pid, s, p));
+      //send(ctrl.getLeader(), new ProposeMsg(pid, s, p));
+      new propSender(s,p).start();
     }
   }
 
@@ -96,4 +97,27 @@ public class Replica extends Role {
   public String myName() {
     return "Replica";
   }
+
+  public class propSender extends Thread {
+    Command p;
+    int s;
+
+    propSender (int s, Command p) {
+      this.s = s;
+      this.p = p;
+    }
+
+    public void run () {
+      while (!decisions.containsValue(p)) {
+        send(ctrl.getLeader(), new ProposeMsg(pid, s, p));
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
+
 }

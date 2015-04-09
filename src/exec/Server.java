@@ -251,6 +251,8 @@ public class Server extends NetNode {
     } else {
       leader = null;
     }
+    hbt = new HeartBeatTimer();
+    hbt.start();
   }
 
 
@@ -262,13 +264,11 @@ public class Server extends NetNode {
     shutdown = true;
     nc.shutdown();
     hbt.cancel();
-    /*
     try {
-      Thread.sleep(300);
+      Thread.sleep(100);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    */
   }
 
 

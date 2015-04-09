@@ -1,5 +1,6 @@
 package exec;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -18,7 +19,7 @@ public class Master {
       int clientIndex, nodeIndex;
       //System.out.println(inputLine[0]);
       if (debug) {
-        System.out.println("Command: " + inputLine[0]);
+        System.out.println("Command: " + Arrays.toString(inputLine));
       }
         if (inputLine[0].equals("start")) {
         numNodes = Integer.parseInt(inputLine[1]);
