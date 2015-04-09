@@ -84,6 +84,8 @@ public class Server extends NetNode {
       leaderID = srm.leaderID;
       replica = new Replica(rpid, this, srm.decisions, srm.slotNum);
       initialization();
+    } else {
+      System.out.println("State Reply NULL!!");
     }
   }
 
@@ -104,12 +106,17 @@ public class Server extends NetNode {
 
 
   public StateReplyMsg getReply (int src) {
-    for (int pid : replicas) {
-      send(pid, new StateQueryMsg(src));
-    }
-
     while (!shutdown) {
+      for (int pid : replicas) {
+        send(pid, new StateQueryMsg(src));
+      }
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
       Message msg = receive();
+      //System.out.println("Where is my reply?");
       if (shutdown) {
         return null;
       }
@@ -148,9 +155,7 @@ public class Server extends NetNode {
           }
         }
       } else  if (msg != null) {
-        if (debug) {
-          System.out.println("Rev@" + index + ": " + msg.print());
-        }
+
         relay(msg);
       }
     }
@@ -197,21 +202,29 @@ public class Server extends NetNode {
    */
   @Override
   public void send(Message msg) {
+    //ns.send(msg);
+    if (timer == 0) {
+      cleanShutDown();
+      return;
+    }
+    super.send(msg);
     if (msg instanceof P1aMsg || msg instanceof P2aMsg) {
       timerLock.lock();
+      if (timer > 0) {
+        timer--;
+        if (debug) {
+          System.out.println("Shutdown timer: " + timer);
+        }
+      }
       if (timer == 0) {
-        //System.out.println("Shutdown Now!");
+        if (debug) {
+          System.out.println("Shutdown Now!");
+        }
         cleanShutDown();
         return;
       }
-      if (timer > 0) {
-        timer--;
-        //System.out.println("Shutdown timer: " + timer);
-      }
       timerLock.unlock();
     }
-    //ns.send(msg);
-    super.send(msg);
   }
 
   public void timeBombLeader (int count) {
@@ -230,10 +243,7 @@ public class Server extends NetNode {
    * Leader election with basic round robin fashion
    */
   public void leaderElection () {
-    leaderID++;
-    if (leaderID > numServers) {
-      leaderID = 1;
-    }
+    leaderID = (leaderID + 1) % numServers;
     if (isLeader()) {
       leader = new Leader(combine(index, Constants.LEADER), this,
           acceptors, replicas);
@@ -243,6 +253,23 @@ public class Server extends NetNode {
     }
   }
 
+
+  /**
+   * Clean shutdown the server, including all the
+   * Replica, Acceptor, Leader, etc. associated with this server
+   */
+  public void cleanShutDown () {
+    shutdown = true;
+    nc.shutdown();
+    hbt.cancel();
+    /*
+    try {
+      Thread.sleep(300);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    */
+  }
 
 
 

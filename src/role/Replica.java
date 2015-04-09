@@ -76,6 +76,7 @@ public class Replica extends Role {
       if (msg instanceof DecisionMsg) {
         DecisionMsg dsnMsg = (DecisionMsg) msg;
         decisions.put(dsnMsg.slotNum, dsnMsg.prop);
+
         while (decisions.containsKey(slotNum)) {
           if (proposals.containsKey(slotNum) &&
               !decisions.get(slotNum).equals(proposals.get(slotNum))) {

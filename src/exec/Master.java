@@ -6,6 +6,7 @@ import java.util.Scanner;
  * Created by xiaofan on 3/30/15.
  */
 public class Master {
+  public static boolean debug = false;
 
   public static void main(String[] args) {
     Scanner scan = new Scanner(System.in);
@@ -16,7 +17,10 @@ public class Master {
       String[] inputLine = scan.nextLine().split(" ");
       int clientIndex, nodeIndex;
       //System.out.println(inputLine[0]);
-      if (inputLine[0].equals("start")) {
+      if (debug) {
+        System.out.println("Command: " + inputLine[0]);
+      }
+        if (inputLine[0].equals("start")) {
         numNodes = Integer.parseInt(inputLine[1]);
         numClients = Integer.parseInt(inputLine[2]);
               /*

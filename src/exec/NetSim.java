@@ -68,7 +68,7 @@ public class NetSim {
    * Create a new thread to rebuild the leader as we need to receive message.
    */
   public void restartServer(int sid) {
-    servers[sid] = new Server(sid + 1, servers.length, clients.length, true);
+    servers[sid] = new Server(sid, servers.length, clients.length, true);
     servers[sid].recover();
     servers[sid].start();
   }

@@ -22,6 +22,11 @@ public class AdoptedMsg extends Message {
 
   @Override
   public String toString() {
-    return "AdoptedMsg: " + src + " " + ballotNum;
+    String rst = "AdoptedMsg: " + src + " " + ballotNum + "\n";
+    for (Pvalue pv : accepted) {
+      rst += pv.toString() + "\n";
+    }
+    rst += "+++++++++++++++++End Adopted Msg ++++++++++++++";
+    return rst;
   }
 }

@@ -45,11 +45,11 @@ public class NetNode extends Thread {
     replicas = new int[numServers];
     for (int i = 0; i < numServers; i++) {
       acceptors[i] = combine(i, Constants.ACCEPTOR);
-      replicas[i]  = combine(i, Constants.REPLICA);
+      replicas[i] = combine(i, Constants.REPLICA);
     }
     clients = new int[numClients];
     for (int i = 0; i < numClients; i++) {
-      clients[i]  = (i + numServers) * Constants.BASE;
+      clients[i] = (i + numServers) * Constants.BASE;
     }
 
     int numNodes = numServers + numClients;
@@ -60,6 +60,7 @@ public class NetNode extends Thread {
 
   /**
    * Send message to Network simulator
+   *
    * @param msg
    */
   public void send(Message msg) {
@@ -67,7 +68,7 @@ public class NetNode extends Thread {
     int serverId = msg.dst / Constants.BASE;
     if (debug) {
       if (!(msg instanceof HeartBeatMsg)) {
-        System.out.println("To: " + serverId + " "+  msg.print());
+        System.out.println("To: " + serverId + " " + msg.print());
       }
     }
     nc.sendMsg(serverId, serialize(msg));
@@ -78,12 +79,18 @@ public class NetNode extends Thread {
     send(msg);
   }
 
-  public void deliver (Message msg) {
+  public void deliver(Message msg) {
     inbox.offer(msg);
   }
 
-  public Message receive () {
-    return inbox.poll();
+  public Message receive() {
+    Message msg = inbox.poll();
+    if (debug) {
+      if (!(msg instanceof HeartBeatMsg)) {
+        System.out.println("Rev@" + pid + ": " + msg.print());
+      }
+    }
+    return msg;
   }
 
   public int combine(int sid, int pid) {
@@ -95,7 +102,7 @@ public class NetNode extends Thread {
    * Translate the Message to a string to transmit through socket
    * Don't want to modify existing socket framework
    */
-  public String serialize (Message msg) {
+  public String serialize(Message msg) {
     String rst = "";
     try {
       ByteArrayOutputStream bo = new ByteArrayOutputStream();
@@ -115,7 +122,7 @@ public class NetNode extends Thread {
    * Translate String to a Message upon receiving from socket
    * Don't want to modify existing socket framework
    */
-  public Message deserialize (String str) {
+  public Message deserialize(String str) {
     Message msg = null;
     try {
       //byte b[] = str.getBytes();
@@ -130,19 +137,6 @@ public class NetNode extends Thread {
     return msg;
   }
 
-  /**
-   * Clean shutdown the server, including all the
-   * Replica, Acceptor, Leader, etc. associated with this server
-   */
-  public void cleanShutDown () {
-    shutdown = true;
-    nc.shutdown();
-    try {
-      Thread.sleep(300);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-  }
 
   /**
    * Inner listener thread

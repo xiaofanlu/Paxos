@@ -4,7 +4,7 @@ import util.Command;
 
 /**
  * Created by xiaofan on 3/26/15.
- * Decision Message for Commander
+ * Response Message to client
  */
 
 public class ResponseMsg extends Message {

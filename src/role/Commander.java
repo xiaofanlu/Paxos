@@ -33,9 +33,13 @@ public class Commander extends Role {
 
   public void exec() {
     for (int acpt : acceptors) {
-      waitfor.add(acpt);
-      send(acpt, new P2aMsg(pid, pv));
+      if (acpt != ctrl.leaderID) {
+        waitfor.add(acpt);
+        send(acpt, new P2aMsg(pid, pv));
+      }
     }
+    waitfor.add(ctrl.leaderID);
+    send(ctrl.leaderID, new P2aMsg(pid, pv));
 
     while (!ctrl.shutdown) {
       Message msg = receive();
