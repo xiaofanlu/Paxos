@@ -221,7 +221,7 @@ public class Server extends NetNode {
           System.out.println("Shutdown Now!");
         }
         cleanShutDown();
-        return;
+        //return;
       }
       timerLock.unlock();
     }
@@ -293,7 +293,7 @@ public class Server extends NetNode {
 
     @Override
     public void run(){
-      setTimeout(Constants.TIMEOUT * 2);
+      setTimeout(Constants.TIMEOUT * 3);
     }
 
     public void setTimeout(long delay){
@@ -317,7 +317,8 @@ public class Server extends NetNode {
     @Override
     public void run(){
       if (debug) {
-        System.out.println(" >>> time out!!! Leader must be down...");
+        System.out.println(" >>>>> " + pid + " time out!!! Leader " +
+            + leaderID + " down.. .");
       }
       leaderElection();
     }

@@ -64,7 +64,8 @@ public class Leader extends Role {
         PreemptedMsg pmptMsg = (PreemptedMsg) msg;
         if (pmptMsg.ballotNum.compareTo(ballotNum) > 0) {
           active = false;
-          ballotNum = new BallotNum(pmptMsg.ballotNum.round, pid);
+          /* bug found, new ballot should be created */
+          ballotNum = new BallotNum(pmptMsg.ballotNum.round + 1, pid);
           new Scout(ctrl.nextId(), ctrl, pid, acceptors, ballotNum).start();
         }
       }
