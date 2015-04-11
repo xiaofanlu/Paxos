@@ -56,7 +56,7 @@ public class Config {
     FileHandler fh;
     try {
       // This block configure the logger with handler and formatter
-      fh = new FileHandler("log/netLog.txt");
+      fh = new FileHandler("netLog.txt");
       logger.addHandler(fh);
       SimpleFormatter formatter = new SimpleFormatter();
       fh.setFormatter(formatter);

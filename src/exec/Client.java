@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Client extends NetNode {
-  public static final boolean GUI_on = true;
+  public boolean GUI_on = true;
 
 
   int sequenceNum;

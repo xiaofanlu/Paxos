@@ -21,6 +21,8 @@ public class Leader extends Role {
   public int[] acceptors;
   public int[] replicas;
 
+  public volatile boolean leaderShutDown = false;
+
   public Leader(int pid, Server ctrl, int[] acceptors, int[] replicas) {
     super(pid, ctrl);
     this.acceptors = acceptors;
@@ -99,7 +101,7 @@ public class Leader extends Role {
 
   class HeartBeater extends Thread {
     public void run() {
-      while (!ctrl.shutdown) {
+      while (!ctrl.shutdown && !leaderShutDown) {
         broadcast(new HeartBeatMsg(pid));
         try {
           Thread.sleep(Constants.TIMEGAP);

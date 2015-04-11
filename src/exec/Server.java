@@ -149,13 +149,20 @@ public class Server extends NetNode {
         }
         int viewNum = msg.src / Constants.BASE;
         if (viewNum != leaderID) {
-          leaderID = viewNum;
-          if (debug) {
-            System.out.println ("New leader detected: " + leaderID);
+          if (isLeader()) {
+            /* multiple leader deteceted, stop heartbeatting if lower id */
+            if (index < viewNum) {
+              leader.leaderShutDown = true;
+              leaderID = viewNum;
+            }
+          } else {
+            leaderID = viewNum;
+            if (debug) {
+              System.out.println("New leader detected: " + leaderID);
+            }
           }
         }
       } else  if (msg != null) {
-
         relay(msg);
       }
     }
