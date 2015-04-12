@@ -17,6 +17,7 @@ public class Scout extends Role {
   BallotNum b;
   Set<Integer> waitfor = new HashSet<Integer>();
   Set<Pvalue> pvalues = new HashSet<Pvalue>();
+  p1aSender sender = new p1aSender();
 
   public Scout(int pid, Server ctrl, int lambda, int[] acceptors,
                BallotNum b) {
@@ -34,10 +35,12 @@ public class Scout extends Role {
       waitfor.add(acpt);
       send(acpt, new P1aMsg(pid, b));
     }
+    sender.start();
 
     while (!ctrl.shutdown) {
       Message msg = receive();
       if (ctrl.shutdown) {
+        sender.finished = true;
         return;
       }
       if (msg instanceof P1bMsg) {
@@ -50,10 +53,12 @@ public class Scout extends Role {
           if (waitfor.size() < (acceptors.length + 1) / 2) {
             Message adopted = new AdoptedMsg(pid, b, pvalues);
             send(lambda, adopted);
+            sender.finished = true;
             return; // exit();
           }
         } else {
           send(lambda, new PreemptedMsg(pid, p1b.ballotNum));
+          sender.finished = true;
           return; // exit();
         }
       }
@@ -64,4 +69,27 @@ public class Scout extends Role {
   public String myName() {
     return "Scout";
   }
+
+  public class p1aSender extends Thread {
+    boolean finished = false;
+
+    public void run () {
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      while (!finished) {
+        for (int acpt : waitfor) {
+          send(acpt, new P1aMsg(pid, b));
+        }
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
 }
