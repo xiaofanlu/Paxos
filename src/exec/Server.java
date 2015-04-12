@@ -234,7 +234,24 @@ public class Server extends NetNode {
     }
   }
 
+  /**  In Piazza Post 78, TA assume that P1a is sent for every message.
+   * Thus timBombLeader [numberOfMsg] will crash the current leader
+   * if numberOfMsg is smaller than numberOfServers.
+   * Since allClear will be called before timeBombLeader,
+   * no more p1a will be sent,
+   * thus is numberOfMsg should be decreased by numberOfServers, i.e.,
+   *
+   *  numberOfMsg = max(0, numberOfMsg - numberOfServers)
+   */
   public void timeBombLeader (int count) {
+
+    /* our implementation optimizes the need for these messages away
+     * after one round with the new leader, so decrement the count by the
+     * number of total replicas anyway (and if it goes below 0, just crash).
+     */
+
+    count = Math.max(0, count - numServers);
+
     timerLock.lock();
     if (isLeader()) {
       if (count == 0) {

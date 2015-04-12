@@ -19,6 +19,7 @@ public class Commander extends Role {
   Pvalue pv;
   BallotNum b;
   Set<Integer> waitfor = new HashSet<Integer>();
+  boolean finished = false;
 
   public Commander(int pid, Server ctrl, int lambda, int[] acceptors,
                    int[] replicas, Pvalue p) {
@@ -46,10 +47,13 @@ public class Commander extends Role {
         send(acpt, new P2aMsg(pid, pv));
       }
     }
+    new p2aSender().start();
+
 
     while (!ctrl.shutdown) {
       Message msg = receive();
       if (ctrl.shutdown) {
+        finished = true;
         return;
       }
       if (msg instanceof P2bMsg) {
@@ -63,10 +67,12 @@ public class Commander extends Role {
               Message decision = new DecisionMsg(pid, pv.slotNum, pv.prop);
               send(p, decision);
             }
+            finished = true;
             return; // exit();
           }
         } else {
           send(lambda, new PreemptedMsg(pid, p2b.ballotNum));
+          finished = true;
           return; // exit();
         }
       }
@@ -75,5 +81,26 @@ public class Commander extends Role {
 
   public String myName() {
     return "Commander";
+  }
+
+
+  public class p2aSender extends Thread {
+    public void run () {
+      try {
+        Thread.sleep(2000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      while (!finished) {
+        for (int acpt : waitfor) {
+          send(acpt, new P2aMsg(pid, pv));
+        }
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
+    }
   }
 }
