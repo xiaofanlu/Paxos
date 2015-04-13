@@ -152,7 +152,9 @@ public class Server extends NetNode {
           if (isLeader()) {
             /* multiple leader deteceted, stop heartbeatting if lower id */
             if (index < viewNum) {
-              leader.leaderShutDown = true;
+              if (leader != null) {
+                leader.leaderShutDown = true;
+              }
               leaderID = viewNum;
             }
           } else {

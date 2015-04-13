@@ -95,7 +95,8 @@ public class Commander extends Role {
         e.printStackTrace();
       }
       while (!finished) {
-        for (int acpt : waitfor) {
+        HashSet<Integer> waitSet = new HashSet<Integer>(waitfor);
+        for (int acpt : waitSet) {
           send(acpt, new P2aMsg(pid, pv));
         }
         try {
